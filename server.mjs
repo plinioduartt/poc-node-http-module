@@ -1,9 +1,12 @@
 import http from 'http';
 import requestHandler from './src/handlers/requestHandler.mjs';
 import initializeRoutes from './src/initializers/routesInitializer.mjs';
-const SERVER_PORT = 8000;
+import dotenv from 'dotenv';
 
+dotenv.config();
+const SERVER_PORT = process.env.PORT || 3000;
 const httpServer = http.createServer(requestHandler);
+
 await initializeRoutes();
 
 httpServer.listen(

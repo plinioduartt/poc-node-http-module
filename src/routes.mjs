@@ -1,4 +1,4 @@
-import { UserController } from "./controllers/users.controller.mjs";
+import { UserController } from "./application/controllers/users.controller.mjs";
 
 const userControllerFactory = () => {
   return new UserController();
@@ -22,6 +22,18 @@ let routes = [
     pathname: "/users",
     controller: userControllerFactory(),
     method: "create"
+  },
+  {
+    http_method: "PATCH",
+    pathname: "/users/:id",
+    controller: userControllerFactory(),
+    method: "update"
+  },
+  {
+    http_method: "DELETE",
+    pathname: "/users/:id",
+    controller: userControllerFactory(),
+    method: "delete"
   },
 ];
 

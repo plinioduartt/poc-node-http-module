@@ -1,18 +1,29 @@
 import routes from '../routes.mjs';
+import { URL } from 'url';
 
 async function pathHandler({ url, method }) {
-  let params;
+  let completeUrl = new URL(`${process.env.HOST}:${process.env.PORT}${url}`);
+  let pathParams;
   let routeFound;
+  let searchParamsReceived = {};
+
+  const { pathname, searchParams } = completeUrl;
+
+  for await (const param of searchParams.keys()) {
+    const value = searchParams.get(param);
+    searchParamsReceived[param] = !!isNaN(value) ? value : Number(value);
+  }
 
   for await (const route of routes) {
-    if (method === route.http_method && route.regex_pattern.test(url)) {
+    if (method === route.http_method && route.regex_pattern.test(pathname)) {
       routeFound = route;
-      
+
       let objParams = {};
       route.params.map((param, index) => {
-        return objParams[param] = route.regex_pattern.exec(url)[index + 1];
+        const value = route.regex_pattern.exec(pathname)[index + 1];
+        return objParams[param] = !!isNaN(value) ? value : Number(value);
       });
-      params = objParams;
+      pathParams = objParams;
 
       break;
     }
@@ -22,7 +33,8 @@ async function pathHandler({ url, method }) {
 
   return {
     routeFound,
-    params
+    pathParams,
+    searchParams: searchParamsReceived
   };
 }
 
