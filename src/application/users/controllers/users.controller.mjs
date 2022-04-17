@@ -1,17 +1,20 @@
-import responseHandler from "../../handlers/responseHandler.mjs";
+import responseHandler from "../../../handlers/responseHandler.mjs";
 
 export class UserController {
-  constructor() { }
+  userService;
+  constructor(userService) {
+    this.userService = userService;
+  }
 
   async listAll(request, response) {
     const searchParams = request.searchParams;
     const { offset, limit } = searchParams;
 
+    const users = await this.userService.listAll(searchParams);
+
     const responseData = {
       data: {
-        users: [
-          { id: '123', name: "Plínio Duarte" }
-        ]
+        users
       },
       offset,
       limit,
@@ -35,10 +38,12 @@ export class UserController {
   async create(request, response) {
     const data = request.body;
 
+    const newUser = await this.userService.create(data);
+
     const responseData = {
       message: `Usuário criado com sucesso.`,
       data: {
-        user: data
+        user: newUser
       }
     };
 

@@ -2,7 +2,9 @@
 
 ## Objective
 
-### Unit tests and integration tests with Jest and Supertest
+### Create a REST API only with node.js HTTP core module
+
+### Do unit tests and integration tests with Jest and Supertest
 
 ### 5 endpoints to handle users
 

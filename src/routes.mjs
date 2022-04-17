@@ -1,7 +1,11 @@
-import { UserController } from "./application/controllers/users.controller.mjs";
+import { UserController } from "./application/users/controllers/users.controller.mjs";
+import { UserService } from "./application/users/services/user.service.mjs";
+import { UserRepository } from "./infrastructure/users/repositories/user.repository.mjs";
 
 const userControllerFactory = () => {
-  return new UserController();
+  const userRepository = new UserRepository();
+  const userService = new UserService(userRepository);
+  return new UserController(userService);
 }
 
 let routes = [
@@ -32,7 +36,7 @@ let routes = [
   {
     http_method: "DELETE",
     pathname: "/users/:id",
-    controller: userControllerFactory(),
+    controller: userControllerFactory({ useDomainServices: false }),
     method: "delete"
   },
 ];
