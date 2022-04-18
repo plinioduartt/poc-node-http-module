@@ -1,4 +1,3 @@
-import mongoose from 'mongoose';
 import User from '../../../domain/users/entities/user.entity.mjs';
 import customError from '../../../handlers/customError.mjs';
 
@@ -14,11 +13,7 @@ export default class UserService {
   }
 
   async getOneById(id) {
-    if (!mongoose.isValidObjectId(id)) {
-      return customError(400, 'Invalid ID format.');
-    }
-
-    const user = await this.userRepository.getOneById(mongoose.Types.ObjectId(id));
+    const user = await this.userRepository.getOneById(id);
 
     if (!user) {
       return customError(404, 'User not found.');
@@ -39,28 +34,23 @@ export default class UserService {
   }
 
   async update(id, data) {
-    if (!mongoose.isValidObjectId(id)) {
-      return customError(400, 'Invalid ID format.');
-    }
-
-    const userExists = await this.userRepository.getOneById(mongoose.Types.ObjectId(id));
+    const userExists = await this.userRepository.getOneById(id);
 
     if (!userExists) {
       return customError(404, 'User not found.');
     }
+
     const user = await this.userRepository.update(id, data);
     return user;
   }
 
   async delete(id) {
-    if (!mongoose.isValidObjectId(id)) {
-      return customError(400, 'Invalid ID format.');
-    }
+    const userExists = await this.userRepository.getOneById(id);
 
-    const userExists = await this.userRepository.getOneById(mongoose.Types.ObjectId(id));
     if (!userExists) {
       return customError(404, 'User not found.');
     }
+    
     await this.userRepository.delete(id);
   }
 }

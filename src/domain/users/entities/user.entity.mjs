@@ -1,10 +1,4 @@
 class User {
-  name;
-  email;
-  age;
-  status;
-  city;
-  uf;
   constructor({
     name,
     email,
@@ -13,14 +7,12 @@ class User {
     city,
     uf
   }) {
-    this._create({
-      name,
-      email,
-      age,
-      status,
-      city,
-      uf
-    });
+    this.name = name;
+    this.email = email;
+    this.age = age;
+    this.status = status;
+    this.city = city;
+    this.uf = uf;
   }
 
   isValid() {
@@ -33,15 +25,6 @@ class User {
       isValid: errors.length === 0,
       errors
     }
-  }
-
-  _create(userData) {
-    this.name = userData.name;
-    this.email = userData.email;
-    this.age = userData.age;
-    this.status = userData.status;
-    this.city = userData.city;
-    this.uf = userData.uf;
   }
 }
 

@@ -1,4 +1,3 @@
-import customError from "../../../handlers/customError.mjs";
 import responseHandler from "../../../handlers/responseHandler.mjs";
 
 export default class UserController {

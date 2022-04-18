@@ -2,43 +2,14 @@ import mockedUsersData from '../../../utils/mockedUsersData.mjs';
 import UserController from './users.controller.mjs';
 import UserService from '../services/user.service.mjs';
 import { jest } from '@jest/globals';
+import customError from '../../../handlers/customError.mjs';
+import mockedUserRepository from '../../../utils/mockedUserRepository.mjs';
 
-jest.setTimeout(50000)
+jest.mock('../../../infrastructure/users/repositories/mongodb-in-memory/user.repository.mjs');
+
+jest.setTimeout(50000);
 
 function UserControllerFactory() {
-  const mockedUserRepository = {
-    listAll: jest.fn().mockImplementation(() => {
-      return mockedUsersData;
-    }),
-    getOneById: jest.fn().mockImplementation(id => {     
-      return mockedUsersData.filter(item => item._id.toString() === id.toString())[0] || null;
-    }),
-    create: jest.fn().mockImplementation((data) => {
-      return {
-        _id: "sa3r23r32r",
-        name: data.name,
-        email: data.email,
-        age: data.age,
-        status: data.status,
-        city: data.city,
-        uf: data.uf,
-      };
-    }),
-    update: jest.fn().mockImplementation((id, data) => {
-      return {
-        _id: id,
-        name: data.name,
-        email: data.email,
-        age: data.age,
-        status: data.status,
-        city: data.city,
-        uf: data.uf,
-      };
-    }),
-    delete: jest.fn().mockImplementation((id) => {
-      return true;
-    })
-  };
   const userService = new UserService(mockedUserRepository);
   return new UserController(userService);
 }
@@ -88,14 +59,27 @@ function HttpFactory() {
 }
 
 describe('User controller', () => {
-  it('List all ==> Should return a array of users with properties for pagination handling', async () => {
-    const userController = new UserControllerFactory();
-    let mockedHttp = new HttpFactory();
-    let mockedRequest = mockedHttp.request();
-    let mockedResponse = mockedHttp.response();
+  const userController = new UserControllerFactory();
+  let mockedHttp = new HttpFactory();
+  let mockedRequest = mockedHttp.request();
+  let mockedResponse = mockedHttp.response();
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  afterAll(() => {
+    jest.resetAllMocks();
+  });
+
+  test('List all ==> Should return a array of users with properties for pagination handling', async () => {
+    // arrange
+
+    // act
     const response = await userController.listAll(mockedRequest, mockedResponse);
     const parsedResponse = JSON.parse(response);
 
+    // asserts
     expect(parsedResponse).toHaveProperty('data');
     expect(parsedResponse).toHaveProperty('offset');
     expect(parsedResponse).toHaveProperty('limit');
@@ -109,15 +93,15 @@ describe('User controller', () => {
     expect(parsedResponse.data.users[0]).toHaveProperty('uf');
   });
 
-  it('Get one by id ==> Should return a specific user by id', async () => {
-    const userController = new UserControllerFactory();
-    let mockedHttp = new HttpFactory();
-    let mockedRequest = mockedHttp.request();
-    let mockedResponse = mockedHttp.response();
+  test('Get one by id ==> Should return a specific user by id', async () => {
+    // arrange
     mockedRequest.pathParams.id = mockedUsersData[0]._id;
+
+    // act
     const response = await userController.getOneById(mockedRequest, mockedResponse);
     const parsedResponse = JSON.parse(response);
 
+    // asserts
     expect(parsedResponse).toHaveProperty('data');
     expect(parsedResponse.data).toHaveProperty('user');
     expect(parsedResponse.data.user).toHaveProperty('_id');
@@ -128,33 +112,8 @@ describe('User controller', () => {
     expect(parsedResponse.data.user).toHaveProperty('uf');
   });
 
-  it('Get one by id NOT FOUND ==> Should throw not found error', async () => {
-    const userController = new UserControllerFactory();
-    let mockedHttp = new HttpFactory();
-    let mockedRequest = await mockedHttp.request();
-    let mockedResponse = await mockedHttp.response();
-    mockedRequest.pathParams.id = '625cbd647715858f53fadcea';
-
-    await expect(async () => await userController.getOneById(mockedRequest, mockedResponse))
-      .rejects.toThrowError(JSON.stringify({ status: 404, message: 'User not found.' }));
-  });
-
-  it('Get one by id INVALID ID FORMAT ==> Should throw not found error', async () => {
-    const userController = new UserControllerFactory();
-    let mockedHttp = new HttpFactory();
-    let mockedRequest = mockedHttp.request();
-    let mockedResponse = mockedHttp.response();
-    mockedRequest.pathParams.id = 'invalidId';
-
-    await expect(async () => await userController.getOneById(mockedRequest, mockedResponse))
-      .rejects.toThrowError(JSON.stringify({ status: 400, message: 'Invalid ID format.' }));
-  });
-
-  it('Create user ==> Should create a new user when called with valid properties', async () => {
-    const userController = new UserControllerFactory();
-    let mockedHttp = new HttpFactory();
-    let mockedRequest = mockedHttp.request();
-    let mockedResponse = mockedHttp.response();
+  test('Create user ==> Should create a new user when called with valid properties', async () => {
+    // arrange
     mockedRequest.body = {
       name: 'Teste usuário 1',
       email: 'teste@gmail.com',
@@ -164,10 +123,11 @@ describe('User controller', () => {
       uf: 'SP'
     };
 
+    // act
     const response = await userController.create(mockedRequest, mockedResponse);
-
     const parsedResponse = JSON.parse(response);
 
+    // asserts
     expect(parsedResponse).toHaveProperty('data');
     expect(parsedResponse.data).toHaveProperty('user');
     expect(parsedResponse.data.user).toHaveProperty('_id');
@@ -179,30 +139,8 @@ describe('User controller', () => {
     expect(parsedResponse.data.user).toHaveProperty('uf');
   });
 
-  test('Create user INVALID PROPERTIES ==> Should throw a error when called with invalid properties', async () => {
-    const userController = new UserControllerFactory();
-    let mockedHttp = new HttpFactory();
-    let mockedRequest = mockedHttp.request();
-    let mockedResponse = mockedHttp.response();
-    mockedRequest.body = {
-      name: 'Teste usuário 1',
-      email: 'teste@gmail.com',
-      status: 'ENABLED',
-      city: 'Paulínia',
-      uf: 'SP'
-    };
-
-    const expectedError = JSON.stringify({ status: 400, message: "property age is missing." });
-    await expect(async () =>
-      await userController.create(mockedRequest, mockedResponse)
-    ).rejects.toThrowError(expectedError);
-  });
-
-  it('Update user ==> Should return a updated user', async () => {
-    const userController = new UserControllerFactory();
-    let mockedHttp = new HttpFactory();
-    let mockedRequest = mockedHttp.request();
-    let mockedResponse = mockedHttp.response();
+  test('Update user ==> Should return a updated user', async () => {
+    // arrange
     mockedRequest.pathParams.id = mockedUsersData[0]._id;
     mockedRequest.body = {
       name: 'Teste usuário 1',
@@ -213,10 +151,11 @@ describe('User controller', () => {
       uf: 'SP'
     };
 
+    // act
     const response = await userController.update(mockedRequest, mockedResponse);
-
     const parsedResponse = JSON.parse(response);
 
+    // asserts
     expect(parsedResponse).toHaveProperty('data');
     expect(parsedResponse.data).toHaveProperty('user');
     expect(parsedResponse.data.user).toHaveProperty('_id');
@@ -228,76 +167,142 @@ describe('User controller', () => {
     expect(parsedResponse.data.user).toHaveProperty('uf');
   });
 
-  it('Update user NOT FOUND ==> Should throw not found error', async () => {
-    const userController = new UserControllerFactory();
-    let mockedHttp = new HttpFactory();
-    let mockedRequest = await mockedHttp.request();
-    let mockedResponse = await mockedHttp.response();
-    mockedRequest.pathParams.id = '625cbd647715858f53fadcea';
-    mockedRequest.body = {
-      name: 'Teste usuário 1',
-      email: 'teste@gmail.com',
-      age: 23,
-      status: 'ENABLED',
-      city: 'Paulínia',
-      uf: 'SP'
-    };
-
-    await expect(async () => await userController.update(mockedRequest, mockedResponse))
-      .rejects.toThrowError(JSON.stringify({ status: 404, message: 'User not found.' }));
-  });
-
-  it('Update user INVALID ID FORMAT ==> Should throw invalid id format error', async () => {
-    const userController = new UserControllerFactory();
-    let mockedHttp = new HttpFactory();
-    let mockedRequest = await mockedHttp.request();
-    let mockedResponse = await mockedHttp.response();
-    mockedRequest.pathParams.id = 'invalidId';
-    mockedRequest.body = {
-      name: 'Teste usuário 1',
-      email: 'teste@gmail.com',
-      age: 23,
-      status: 'ENABLED',
-      city: 'Paulínia',
-      uf: 'SP'
-    };
-
-    await expect(async () => await userController.update(mockedRequest, mockedResponse))
-      .rejects.toThrowError(JSON.stringify({ status: 400, message: 'Invalid ID format.' }));
-  });
-
-  it('Delete user ==> Should delete a user', async () => {
-    const userController = new UserControllerFactory();
-    let mockedHttp = new HttpFactory();
-    let mockedRequest = mockedHttp.request();
-    let mockedResponse = mockedHttp.response();
+  test('Delete user ==> Should delete a user', async () => {
+    // arrange
     mockedRequest.pathParams.id = mockedUsersData[0]._id;
+
+    // act
     const response = await userController.delete(mockedRequest, mockedResponse);
     const parsedReponse = JSON.parse(response);
 
+    // asserts
     expect(parsedReponse).toHaveProperty('message');
-    expect(parsedReponse.message).toBe(`Usuário #${mockedUsersData[0]._id} deletado com sucesso.`);  
+    expect(parsedReponse.message).toBe(`Usuário #${mockedUsersData[0]._id} deletado com sucesso.`);
+  });
+});
+
+describe('User controller expected errors', () => {
+  const userController = new UserControllerFactory();
+  let mockedHttp = new HttpFactory();
+  let mockedRequest = mockedHttp.request();
+  let mockedResponse = mockedHttp.response();
+
+  afterEach(() => {
+    jest.clearAllMocks();
   });
 
-  it('Delete user NOT FOUND ==> Should throw not found error', async () => {
-    const userController = new UserControllerFactory();
-    let mockedHttp = new HttpFactory();
-    let mockedRequest = mockedHttp.request();
-    let mockedResponse = mockedHttp.response();
+  afterAll(() => {
+    jest.resetAllMocks();
+  });
+
+  test('Get one by id NOT FOUND ==> Should throw not found error', async () => {
+    // arrange
     mockedRequest.pathParams.id = '625cbd647715858f53fadcea';
 
-    await expect(async () => await userController.delete(mockedRequest, mockedResponse))
-      .rejects.toThrowError(JSON.stringify({ status: 404, message: 'User not found.' }));
+    // act
+    await expect(async () => await userController.getOneById(mockedRequest, mockedResponse))
+
+      // asserts
+      .rejects.toThrowError(JSON.stringify({ error: { status: 404, message: 'User not found.' } }));
   });
 
-  it('Delete user INVALID ID FORMAT ==> Should throw invalid id format error', async () => {
-    const userController = new UserControllerFactory();
-    let mockedHttp = new HttpFactory();
-    let mockedRequest = mockedHttp.request();
-    let mockedResponse = mockedHttp.response();
+  test('Get one by id INVALID ID FORMAT ==> Should throw not found error', async () => {
+    // arrange
     mockedRequest.pathParams.id = 'invalidId';
+    mockedUserRepository.getOneById = jest.fn()
+      .mockRejectedValueOnce(() => customError(400, "Invalid ID format."));
 
+    // act
+    await expect(async () => await userController.getOneById(mockedRequest, mockedResponse))
+
+      // asserts
+      .rejects.toThrowError(JSON.stringify({ error: { status: 400, message: 'Invalid ID format.' } }));
+  });
+
+  test('Create user INVALID PROPERTIES ==> Should throw a error when called with invalid properties', async () => {
+    // arrange
+    mockedRequest.body = {
+      name: 'Teste usuário 1',
+      email: 'teste@gmail.com',
+      status: 'ENABLED',
+      city: 'Paulínia',
+      uf: 'SP'
+    };
+
+    // act
+    await expect(async () => await userController.create(mockedRequest, mockedResponse))
+
+      // asserts
+      .rejects.toThrowError(JSON.stringify({ error: { status: 400, message: "property age is missing." } }));
+  });
+
+  test('Update user NOT FOUND ==> Should throw not found error', async () => {
+    // arrange
+    mockedRequest.pathParams.id = '625cbd647715858f53fadcea';
+    mockedRequest.body = {
+      name: 'Teste usuário 1',
+      email: 'teste@gmail.com',
+      age: 23,
+      status: 'ENABLED',
+      city: 'Paulínia',
+      uf: 'SP'
+    };
+
+    // act
+    await expect(async () => await userController.update(mockedRequest, mockedResponse))
+
+      // asserts
+      .rejects.toThrowError(JSON.stringify({ error: { status: 404, message: 'User not found.' } }));
+  });
+
+  test('Update user INVALID ID FORMAT ==> Should throw invalid id format error', async () => {
+    // arrange
+    mockedRequest.pathParams.id = 'invalidId';
+    mockedRequest.body = {
+      name: 'Teste usuário 1',
+      email: 'teste@gmail.com',
+      age: 23,
+      status: 'ENABLED',
+      city: 'Paulínia',
+      uf: 'SP'
+    };
+    /** 
+     * for deleting a user, first, the service checks if the user exists with a getOnebyId method
+     * */
+    mockedUserRepository.getOneById = jest.fn()
+      .mockRejectedValueOnce(() => customError(400, "Invalid ID format."));
+
+    // act
+    await expect(async () => await userController.update(mockedRequest, mockedResponse))
+
+      // asserts
+      .rejects.toThrowError(JSON.stringify({ error: { status: 400, message: 'Invalid ID format.' } }));
+  });
+
+  test('Delete user NOT FOUND ==> Should throw not found error', async () => {
+    // arrange
+    mockedRequest.pathParams.id = '625cbd647715858f53fadcea';
+
+    // act
     await expect(async () => await userController.delete(mockedRequest, mockedResponse))
-      .rejects.toThrowError(JSON.stringify({ status: 400, message: 'Invalid ID format.' }));
+
+      // asserts
+      .rejects.toThrowError(JSON.stringify({ error: { status: 404, message: 'User not found.' } }));
+  });
+
+  test('Delete user INVALID ID FORMAT ==> Should throw invalid id format error', async () => {
+    // arrange
+    mockedRequest.pathParams.id = 'invalidId';
+    /** 
+     * for deleting a user, first, the service checks if the user exists with a getOnebyId method
+     * */
+    mockedUserRepository.getOneById = jest.fn()
+      .mockRejectedValueOnce(() => customError(400, "Invalid ID format."));
+
+    // act
+    await expect(async () => await userController.delete(mockedRequest, mockedResponse))
+
+      // asserts
+      .rejects.toThrowError(JSON.stringify({ error: { status: 400, message: 'Invalid ID format.' } }));
   });
 });
