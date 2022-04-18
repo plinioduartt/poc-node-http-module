@@ -1,6 +1,7 @@
+import customError from "../../../handlers/customError.mjs";
 import responseHandler from "../../../handlers/responseHandler.mjs";
 
-export class UserController {
+export default class UserController {
   userService;
   constructor(userService) {
     this.userService = userService;
@@ -11,7 +12,6 @@ export class UserController {
     const { offset, limit } = searchParams;
 
     const users = await this.userService.listAll(searchParams);
-
     const responseData = {
       data: {
         users
@@ -26,9 +26,11 @@ export class UserController {
   async getOneById(request, response) {
     const { id } = request.pathParams;
 
+    const user = await this.userService.getOneById(id);
+
     const responseData = {
       data: {
-        id
+        user
       }
     };
 
@@ -37,9 +39,7 @@ export class UserController {
 
   async create(request, response) {
     const data = request.body;
-
     const newUser = await this.userService.create(data);
-
     const responseData = {
       message: `Usuário criado com sucesso.`,
       data: {
@@ -52,12 +52,13 @@ export class UserController {
 
   async update(request, response) {
     const { id } = request.pathParams;
-    const data = request.body;
 
+    const data = request.body;
+    const updatedUser = await this.userService.update(id, data);
     const responseData = {
       message: `Usuário #${id} atualizado com sucesso.`,
       data: {
-        user: { id, ...data }
+        user: updatedUser
       }
     };
 
@@ -66,6 +67,8 @@ export class UserController {
 
   async delete(request, response) {
     const { id } = request.pathParams;
+
+    await this.userService.delete(id);
 
     const responseData = {
       message: `Usuário #${id} deletado com sucesso.`,

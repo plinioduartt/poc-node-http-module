@@ -1,5 +1,7 @@
-import errorHandler from "./errorHandler.mjs";
+import httpErrorHandler from "./httpErrorHandler.mjs";
+import customError from "./customError.mjs";
 import pathHandler from "./pathHandler.mjs";
+import logger from "../utils/logger.mjs";
 
 async function requestHandler(request, response, next) {
   try {
@@ -14,10 +16,7 @@ async function requestHandler(request, response, next) {
     /** */
 
     if (!routeFound) {
-      return errorHandler({
-        status: 404,
-        message: "Route not found."
-      }, response);
+      return customError(404, "Route not found.");
     }
 
     /** 
@@ -39,16 +38,16 @@ async function requestHandler(request, response, next) {
     const controller = routeFound.controller;
     const methodToBeCalled = (Reflect.get(controller, routeFound.method)).bind(controller);
     if (!methodToBeCalled || typeof methodToBeCalled !== 'function') {
-      return errorHandler({
-        status: 400,
-        message: "Not implemented."
-      }, response);
+      return customError(400, "Not implemented.");
     }
     await methodToBeCalled(request, response, next);
     /** */
   } catch (error) {
-    return errorHandler({
-      status: 500,
+    logger.debug('Error in request handler ==> ' + error);
+    logger.debug('Error status ==> ' + error.status);
+    logger.debug('Error message ==> ' + error.message);
+    return httpErrorHandler({
+      status: error.status || 500,
       message: error.message || "Internal server error."
     }, response);
   }

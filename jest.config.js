@@ -8,6 +8,6 @@ export default {
   preset: 'ts-jest',
   testEnvironment: 'node',
   testMatch: [
-    "**/?(*.)+(spec|test).[mjs]?(x)"
+    "**/?(*.)+(spec|test).[mj]s?(x)"
   ]
 };

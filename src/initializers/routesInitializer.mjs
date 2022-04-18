@@ -1,8 +1,9 @@
 import routes from '../routes.mjs';
 import { pathToRegexp } from "path-to-regexp";
+import logger from '../utils/logger.mjs';
 
 async function initializeRoutes() {
-  console.log('initializing routes...');
+  logger.info({}, 'initializing routes...');
 
   for await (const route of routes) {
     let params = [];
@@ -10,7 +11,7 @@ async function initializeRoutes() {
     route.params = params.map(param => param.name);
   }
 
-  console.log('routes initialized...');
+  logger.info({}, 'routes initialized...');
 }
 
 export default initializeRoutes;

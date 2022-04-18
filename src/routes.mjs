@@ -1,6 +1,6 @@
-import { UserController } from "./application/users/controllers/users.controller.mjs";
-import { UserService } from "./application/users/services/user.service.mjs";
-import { UserRepository } from "./infrastructure/users/repositories/user.repository.mjs";
+import UserController from "./application/users/controllers/users.controller.mjs";
+import UserService from "./application/users/services/user.service.mjs";
+import UserRepository from "./infrastructure/users/repositories/mongodb-in-memory/user.repository.mjs";
 
 const userControllerFactory = () => {
   const userRepository = new UserRepository();
