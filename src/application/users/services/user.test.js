@@ -113,9 +113,10 @@ describe('User service', () => {
     const id = mockedUsersData[0]._id;
 
     // act
-    await expect(async () => await userService.delete(id))
+    const request = async () => await userService.delete(id);
 
-      // asserts
+    // asserts
+    await expect(request)
       .toBeTruthy();
   });
 });
@@ -136,9 +137,10 @@ describe('User service expected errors', () => {
     const id = '625cbd647715858f53fadcea';
 
     // act
-    await expect(async () => await userService.getOneById(id))
+    const request = async () => await userService.getOneById(id);
 
-      // assert
+    // assert
+    await expect(request)
       .rejects.toThrowError(JSON.stringify({ status: 404, message: 'User not found.' }));
   });
 
@@ -149,9 +151,10 @@ describe('User service expected errors', () => {
       .mockRejectedValueOnce(() => customError(400, "Invalid ID format."));
 
     // act
-    await expect(async () => await userService.getOneById(id))
+    const request = async () => await userService.getOneById(id);
 
-      // asserts
+    // asserts
+    await expect(request)
       .rejects.toThrowError(JSON.stringify({ error: { status: 400, message: "Invalid ID format." } }));
   });
 
@@ -166,9 +169,10 @@ describe('User service expected errors', () => {
     };
 
     // act
-    await expect(async () => await userService.create(dataWithoutAge))
+    const request = async () => await userService.create(dataWithoutAge);
 
-      // asserts
+    // asserts
+    await expect(request)
       .rejects.toThrowError('property age is missing.');
   });
 
@@ -185,9 +189,10 @@ describe('User service expected errors', () => {
     };
 
     // act
-    await expect(async () => await userService.update(id, data))
+    const request = async () => await userService.update(id, data);
 
-      // asserts
+    // asserts
+    await expect(request)
       .rejects.toThrowError(JSON.stringify({ status: 404, message: 'User not found.' }));
   });
 
@@ -209,9 +214,10 @@ describe('User service expected errors', () => {
       .mockRejectedValueOnce(() => customError(400, "Invalid ID format."));
 
     // act
-    await expect(async () => await userService.update(id, data))
+    const request = async () => await userService.update(id, data);
 
-      //assert
+    //assert
+    await expect(request)
       .rejects.toThrowError(JSON.stringify({ error: { status: 400, message: "Invalid ID format." } }));
   });
 
@@ -220,9 +226,10 @@ describe('User service expected errors', () => {
     const id = '625cbd647715858f53fadcea';
 
     // act
-    await expect(async () => await userService.delete(id))
+    const request = async () => await userService.delete(id);
 
-      // asserts
+    // asserts
+    await expect(request)
       .rejects.toThrowError(JSON.stringify({ status: 404, message: 'User not found.' }));
   });
 
@@ -236,9 +243,10 @@ describe('User service expected errors', () => {
       .mockRejectedValueOnce(() => customError(400, "Invalid ID format."));
 
     // act
-    await expect(async () => await userService.delete(id))
+    const request = async () => await userService.delete(id);
 
-      // asserts
+    // asserts
+    await expect(request)
       .rejects.toThrowError(JSON.stringify({ error: { status: 400, message: "Invalid ID format." } }));
   });
 });

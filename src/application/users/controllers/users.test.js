@@ -200,9 +200,10 @@ describe('User controller expected errors', () => {
     mockedRequest.pathParams.id = '625cbd647715858f53fadcea';
 
     // act
-    await expect(async () => await userController.getOneById(mockedRequest, mockedResponse))
+    const request = async () => await userController.getOneById(mockedRequest, mockedResponse);
 
-      // asserts
+    // asserts
+    await expect(request)
       .rejects.toThrowError(JSON.stringify({ error: { status: 404, message: 'User not found.' } }));
   });
 
@@ -213,9 +214,10 @@ describe('User controller expected errors', () => {
       .mockRejectedValueOnce(() => customError(400, "Invalid ID format."));
 
     // act
-    await expect(async () => await userController.getOneById(mockedRequest, mockedResponse))
+    const request = async () => await userController.getOneById(mockedRequest, mockedResponse);
 
-      // asserts
+    // asserts
+    await expect(request)
       .rejects.toThrowError(JSON.stringify({ error: { status: 400, message: 'Invalid ID format.' } }));
   });
 
@@ -230,9 +232,10 @@ describe('User controller expected errors', () => {
     };
 
     // act
-    await expect(async () => await userController.create(mockedRequest, mockedResponse))
+    const request = async () => await userController.create(mockedRequest, mockedResponse);
 
-      // asserts
+    // asserts
+    await expect(request)
       .rejects.toThrowError(JSON.stringify({ error: { status: 400, message: "property age is missing." } }));
   });
 
@@ -249,9 +252,10 @@ describe('User controller expected errors', () => {
     };
 
     // act
-    await expect(async () => await userController.update(mockedRequest, mockedResponse))
+    const request = async () => await userController.update(mockedRequest, mockedResponse);
 
-      // asserts
+    // asserts
+    await expect(request)
       .rejects.toThrowError(JSON.stringify({ error: { status: 404, message: 'User not found.' } }));
   });
 
@@ -273,9 +277,10 @@ describe('User controller expected errors', () => {
       .mockRejectedValueOnce(() => customError(400, "Invalid ID format."));
 
     // act
-    await expect(async () => await userController.update(mockedRequest, mockedResponse))
+    const request = async () => await userController.update(mockedRequest, mockedResponse);
 
-      // asserts
+    // asserts
+    await expect(request)
       .rejects.toThrowError(JSON.stringify({ error: { status: 400, message: 'Invalid ID format.' } }));
   });
 
@@ -284,9 +289,10 @@ describe('User controller expected errors', () => {
     mockedRequest.pathParams.id = '625cbd647715858f53fadcea';
 
     // act
-    await expect(async () => await userController.delete(mockedRequest, mockedResponse))
+    const request = async () => await userController.delete(mockedRequest, mockedResponse);
 
-      // asserts
+    // asserts
+    await expect(request)
       .rejects.toThrowError(JSON.stringify({ error: { status: 404, message: 'User not found.' } }));
   });
 
@@ -300,9 +306,10 @@ describe('User controller expected errors', () => {
       .mockRejectedValueOnce(() => customError(400, "Invalid ID format."));
 
     // act
-    await expect(async () => await userController.delete(mockedRequest, mockedResponse))
+    const request = async () => await userController.delete(mockedRequest, mockedResponse);
 
-      // asserts
+    // asserts
+    await expect(request)
       .rejects.toThrowError(JSON.stringify({ error: { status: 400, message: 'Invalid ID format.' } }));
   });
 });

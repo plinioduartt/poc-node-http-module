@@ -18,6 +18,7 @@ export default class UserService {
     if (!user) {
       return customError(404, 'User not found.');
     }
+    
     return user;
   }
 
