@@ -16,7 +16,7 @@ export default {
       age: data.age,
       status: data.status,
       city: data.city,
-      uf: data.uf,
+      state: data.state,
     };
   }),
   update: jest.fn().mockImplementation((id, data: any) => {
@@ -27,7 +27,7 @@ export default {
       age: data.age,
       status: data.status,
       city: data.city,
-      uf: data.uf,
+      state: data.state,
     };
   }),
   delete: jest.fn().mockImplementation(() => {

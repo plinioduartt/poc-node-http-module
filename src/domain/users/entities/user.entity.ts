@@ -7,7 +7,7 @@ class User {
   public readonly age: number;
   public readonly status: string;
   public readonly city: string;
-  public readonly uf: string;
+  public readonly state: string;
 
   constructor({
     name,
@@ -15,14 +15,14 @@ class User {
     age,
     status,
     city,
-    uf
+    state
   }: IUser) {
     this.name = name;
     this.email = email;
     this.age = age;
     this.status = status;
     this.city = city;
-    this.uf = uf;
+    this.state = state;
   }
 
  isValid() {

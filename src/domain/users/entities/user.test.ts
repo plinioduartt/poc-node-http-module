@@ -5,7 +5,7 @@ import { IUser } from './user.type';
 describe("User Entity", () => {
   it("should create a valid User instance", () => {
     // arrange
-    const testUser = new User({ name: "Test user", email: 'test@gmail.com', age: 23, status: 'ENABLED', city: 'Paulínia', uf: 'SP' } as IUser);
+    const testUser = new User({ name: "Test user", email: 'test@gmail.com', age: 23, status: 'ENABLED', city: 'Paulínia', state: 'SP' } as IUser);
 
     // act
     const { isValid } = testUser.isValid();
@@ -18,12 +18,12 @@ describe("User Entity", () => {
     expect(testUser).toHaveProperty('age');
     expect(testUser).toHaveProperty('status');
     expect(testUser).toHaveProperty('city');
-    expect(testUser).toHaveProperty('uf');
+    expect(testUser).toHaveProperty('state');
   });
 
   it("should return an error when missing a property", () => {
     // arrange
-    const data: IUser = { name: "Test user", email: 'test@gmail.com', age: 23, status: 'ENABLED', city: 'Paulínia', uf: 'SP' };
+    const data: IUser = { name: "Test user", email: 'test@gmail.com', age: 23, status: 'ENABLED', city: 'Paulínia', state: 'SP' };
     const testUser = new User(omit(data, ['age']) as IUser);
 
     // act

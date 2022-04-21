@@ -6,7 +6,7 @@ export default [
     age: 23,
     status: 'ENABLED',
     city: 'Paulínia',
-    uf: 'SP'
+    state: 'SP'
   },
   {
     _id: '625cc241a814e93465aaa472',
@@ -15,7 +15,7 @@ export default [
     age: 23,
     status: 'ENABLED',
     city: 'Paulínia',
-    uf: 'SP'
+    state: 'SP'
   },
   {
     _id: '625cc244a814e93465aaa474',
@@ -24,6 +24,6 @@ export default [
     age: 23,
     status: 'ENABLED',
     city: 'Paulínia',
-    uf: 'SP'
+    state: 'SP'
   },
 ]

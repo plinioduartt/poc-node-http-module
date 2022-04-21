@@ -97,7 +97,7 @@ describe('User controller', () => {
     expect(parsedResponse.data.users[0]).toHaveProperty('email');
     expect(parsedResponse.data.users[0]).toHaveProperty('age');
     expect(parsedResponse.data.users[0]).toHaveProperty('city');
-    expect(parsedResponse.data.users[0]).toHaveProperty('uf');
+    expect(parsedResponse.data.users[0]).toHaveProperty('state');
   });
 
   test('Get one by id ==> Should return a specific user by id', async () => {
@@ -116,7 +116,7 @@ describe('User controller', () => {
     expect(parsedResponse.data.user).toHaveProperty('email');
     expect(parsedResponse.data.user).toHaveProperty('age');
     expect(parsedResponse.data.user).toHaveProperty('city');
-    expect(parsedResponse.data.user).toHaveProperty('uf');
+    expect(parsedResponse.data.user).toHaveProperty('state');
   });
 
   test('Create user ==> Should create a new user when called with valid properties', async () => {
@@ -127,7 +127,7 @@ describe('User controller', () => {
       age: 23,
       status: 'ENABLED',
       city: 'Paulínia',
-      uf: 'SP'
+      state: 'SP'
     } as IUser;
 
     // act
@@ -143,7 +143,7 @@ describe('User controller', () => {
     expect(parsedResponse.data.user).toHaveProperty('age');
     expect(parsedResponse.data.user).toHaveProperty('status');
     expect(parsedResponse.data.user).toHaveProperty('city');
-    expect(parsedResponse.data.user).toHaveProperty('uf');
+    expect(parsedResponse.data.user).toHaveProperty('state');
   });
 
   test('Update user ==> Should return a updated user', async () => {
@@ -155,7 +155,7 @@ describe('User controller', () => {
       age: 23,
       status: 'ENABLED',
       city: 'Paulínia',
-      uf: 'SP'
+      state: 'SP'
     } as IUser;
 
     // act
@@ -171,7 +171,7 @@ describe('User controller', () => {
     expect(parsedResponse.data.user).toHaveProperty('age');
     expect(parsedResponse.data.user).toHaveProperty('status');
     expect(parsedResponse.data.user).toHaveProperty('city');
-    expect(parsedResponse.data.user).toHaveProperty('uf');
+    expect(parsedResponse.data.user).toHaveProperty('state');
   });
 
   test('Delete user ==> Should delete a user', async () => {
@@ -237,7 +237,7 @@ describe('User controller expected errors', () => {
       email: 'teste@gmail.com',
       status: 'ENABLED',
       city: 'Paulínia',
-      uf: 'SP'
+      state: 'SP'
     } as IUser;
 
     // act
@@ -257,7 +257,7 @@ describe('User controller expected errors', () => {
       age: 23,
       status: 'ENABLED',
       city: 'Paulínia',
-      uf: 'SP'
+      state: 'SP'
     } as IUser;
 
     // act
@@ -277,7 +277,7 @@ describe('User controller expected errors', () => {
       age: 23,
       status: 'ENABLED',
       city: 'Paulínia',
-      uf: 'SP'
+      state: 'SP'
     } as IUser;
     /** 
      * for deleting a user, first, the service checks if the user exists with a getOnebyId method

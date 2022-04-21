@@ -5,5 +5,5 @@ export type IUser = {
   age: number;
   status: string;
   city: string;
-  uf: string;
+  state: string;
 }

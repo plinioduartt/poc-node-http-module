@@ -17,7 +17,7 @@ const schema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  uf: {
+  state: {
     type: String,
     required: true,
   },

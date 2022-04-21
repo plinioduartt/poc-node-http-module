@@ -42,7 +42,7 @@ describe('User service', () => {
     expect(users[0]).toHaveProperty('age');
     expect(users[0]).toHaveProperty('status');
     expect(users[0]).toHaveProperty('city');
-    expect(users[0]).toHaveProperty('uf');
+    expect(users[0]).toHaveProperty('state');
   });
 
   test('Get one by id ==> Should return a specific user by id', async () => {
@@ -59,7 +59,7 @@ describe('User service', () => {
     expect(user).toHaveProperty('age');
     expect(user).toHaveProperty('status');
     expect(user).toHaveProperty('city');
-    expect(user).toHaveProperty('uf');
+    expect(user).toHaveProperty('state');
   });
 
   test('Create user ==> Should return a new user', async () => {
@@ -70,7 +70,7 @@ describe('User service', () => {
       age: 23,
       status: 'ENABLED',
       city: 'Paulínia',
-      uf: 'SP'
+      state: 'SP'
     };
 
     // act
@@ -83,7 +83,7 @@ describe('User service', () => {
     expect(user).toHaveProperty('age');
     expect(user).toHaveProperty('status');
     expect(user).toHaveProperty('city');
-    expect(user).toHaveProperty('uf');
+    expect(user).toHaveProperty('state');
   });
 
   test('Update user ==> Should return a updated user', async () => {
@@ -95,7 +95,7 @@ describe('User service', () => {
       age: 23,
       status: 'ENABLED',
       city: 'Paulínia',
-      uf: 'SP'
+      state: 'SP'
     };
 
     // act
@@ -108,7 +108,7 @@ describe('User service', () => {
     expect(user).toHaveProperty('age');
     expect(user).toHaveProperty('status');
     expect(user).toHaveProperty('city');
-    expect(user).toHaveProperty('uf');
+    expect(user).toHaveProperty('state');
   });
 
   test('Delete user ==> Should delete a user by id', async () => {
@@ -171,7 +171,7 @@ describe('User service expected errors', () => {
       age: 23,
       status: 'ENABLED',
       city: 'Paulínia',
-      uf: 'SP'
+      state: 'SP'
     };
 
     // act
@@ -191,7 +191,7 @@ describe('User service expected errors', () => {
       age: 23,
       status: 'ENABLED',
       city: 'Paulínia',
-      uf: 'SP'
+      state: 'SP'
     };
 
     // act
@@ -211,7 +211,7 @@ describe('User service expected errors', () => {
       age: 23,
       status: 'ENABLED',
       city: 'Paulínia',
-      uf: 'SP'
+      state: 'SP'
     };
     /** 
       * for deleting a user, first, the service checks if the user exists with a getOnebyId method
