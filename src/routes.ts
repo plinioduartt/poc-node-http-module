@@ -1,6 +1,7 @@
-import UserController from "./application/users/controllers/users.controller.mjs";
-import UserService from "./application/users/services/user.service.mjs";
-import UserRepository from "./infrastructure/users/repositories/mongodb-in-memory/user.repository.mjs";
+import UserController from "./application/users/controllers/users.controller";
+import UserService from "./application/users/services/user.service";
+import { HttpRoute } from "./http/routes/types/routes.type";
+import UserRepository from "./infrastructure/users/repositories/mongodb-in-memory/user.repository";
 
 const userControllerFactory = () => {
   const userRepository = new UserRepository();
@@ -10,12 +11,12 @@ const userControllerFactory = () => {
 
 const userController = userControllerFactory();
 
-let routes = [
+let routes: HttpRoute[] = [
   {
     http_method: "GET",
     pathname: "/users",
     controller: userController,
-    method: "listAll"
+    method: "listAll",
   },
   {
     http_method: "GET",

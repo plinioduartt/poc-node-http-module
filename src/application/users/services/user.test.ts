@@ -1,19 +1,22 @@
-import UserService from './user.service.mjs';
+import UserService from './user.service';
 import { jest } from '@jest/globals';
-import mockedUsersData from '../../../utils/mockedUsersData.mjs';
-import mockedUserRepository from '../../../utils/mockedUserRepository.mjs';
-import customError from '../../../handlers/customError.mjs';
+import mockedUsersData from '../../../utils/mockedUsersData';
+import mockedUserRepository from '../../../utils/mockedUserRepository';
+import CustomError from '../../../errors/CustomError';
+import IUserRepository from '@/src/domain/users/repositories/user.repository';
+import { IUser } from '@/src/domain/users/entities/user.type';
+import { omit } from 'lodash';
 
-jest.mock('../../../infrastructure/users/repositories/mongodb-in-memory/user.repository.mjs');
+jest.mock('../../../domain/users/repositories/user.repository');
 
 jest.setTimeout(50000);
 
-function UserServiceFactory() {
-  return new UserService(mockedUserRepository);
+function userServiceFactory() {
+  return new UserService(mockedUserRepository as IUserRepository);
 }
 
 describe('User service', () => {
-  const userService = new UserServiceFactory();
+  const userService = userServiceFactory();
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -61,7 +64,7 @@ describe('User service', () => {
 
   test('Create user ==> Should return a new user', async () => {
     // arrange
-    const data = {
+    const data: IUser = {
       name: 'Teste usuário 1',
       email: 'teste@gmail.com',
       age: 23,
@@ -86,7 +89,7 @@ describe('User service', () => {
   test('Update user ==> Should return a updated user', async () => {
     // arrange
     const id = mockedUsersData[0]._id;
-    const data = {
+    const data: IUser = {
       name: 'Teste usuário 1',
       email: 'teste@gmail.com',
       age: 23,
@@ -122,7 +125,7 @@ describe('User service', () => {
 });
 
 describe('User service expected errors', () => {
-  const userService = new UserServiceFactory();
+  const userService = userServiceFactory();
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -148,7 +151,9 @@ describe('User service expected errors', () => {
     // arrange
     const id = 'invalidId';
     mockedUserRepository.getOneById = jest.fn()
-      .mockRejectedValueOnce(() => customError(400, "Invalid ID format."));
+      .mockRejectedValueOnce(() => {
+        throw new CustomError({ status: 400, message: "Invalid ID format." });
+      });
 
     // act
     const request = async () => await userService.getOneById(id);
@@ -160,16 +165,17 @@ describe('User service expected errors', () => {
 
   test('Create user with validation error ==> Should return a error when create new user with invalid fields', async () => {
     // arrange
-    const dataWithoutAge = {
+    const data: IUser = {
       name: 'Teste usuário 1',
       email: 'teste@gmail.com',
+      age: 23,
       status: 'ENABLED',
       city: 'Paulínia',
       uf: 'SP'
     };
 
     // act
-    const request = async () => await userService.create(dataWithoutAge);
+    const request = async () => await userService.create(omit(data, ['age']) as IUser);
 
     // asserts
     await expect(request)
@@ -179,7 +185,7 @@ describe('User service expected errors', () => {
   test('Update user NOT FOUND ==> Should throw not found error', async () => {
     // arrange
     const id = '625cbd647715858f53fadcea';
-    const data = {
+    const data: IUser = {
       name: 'Teste usuário 1',
       email: 'teste@gmail.com',
       age: 23,
@@ -211,7 +217,9 @@ describe('User service expected errors', () => {
       * for deleting a user, first, the service checks if the user exists with a getOnebyId method
     * */
     mockedUserRepository.getOneById = jest.fn()
-      .mockRejectedValueOnce(() => customError(400, "Invalid ID format."));
+      .mockRejectedValueOnce(() => {
+        throw new CustomError({ status: 400, message: "Invalid ID format." });
+      });
 
     // act
     const request = async () => await userService.update(id, data);
@@ -240,7 +248,9 @@ describe('User service expected errors', () => {
       * for deleting a user, first, the service checks if the user exists with a getOnebyId method
     * */
     mockedUserRepository.getOneById = jest.fn()
-      .mockRejectedValueOnce(() => customError(400, "Invalid ID format."));
+      .mockRejectedValueOnce(() => {
+        throw new CustomError({ status: 400, message: "Invalid ID format." });
+      });
 
     // act
     const request = async () => await userService.delete(id);

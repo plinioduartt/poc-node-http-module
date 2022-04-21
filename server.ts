@@ -1,5 +1,5 @@
-import httpServer from './app.mjs';
-import logger from './src/utils/logger.mjs';
+import httpServer from './app';
+import logger from './src/utils/logger';
 
 const SERVER_PORT = process.env.PORT || 3000;
 

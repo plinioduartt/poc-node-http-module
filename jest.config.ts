@@ -4,10 +4,10 @@ export default {
   collectCoverage: true,
   coverageDirectory: "coverage",
   coverageProvider: "v8",
-  setupFiles: ["<rootDir>/src/initializers/testsInitializer.mjs"],
+  setupFiles: ["<rootDir>/src/initializers/testsInitializer.ts"],
   preset: 'ts-jest',
   testEnvironment: 'node',
   testMatch: [
-    "**/?(*.)+(spec|test).[mj]s?(x)"
+    "**/?(*.)+(spec|test).[t]s?(x)"
   ]
 };

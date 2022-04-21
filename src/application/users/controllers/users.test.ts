@@ -1,20 +1,27 @@
-import mockedUsersData from '../../../utils/mockedUsersData.mjs';
-import UserController from './users.controller.mjs';
-import UserService from '../services/user.service.mjs';
+import mockedUsersData from '../../../utils/mockedUsersData';
+import UserController from './users.controller';
+import UserService from '../services/user.service';
 import { jest } from '@jest/globals';
-import customError from '../../../handlers/customError.mjs';
-import mockedUserRepository from '../../../utils/mockedUserRepository.mjs';
+import mockedUserRepository from '../../../utils/mockedUserRepository';
+import CustomError from '../../../errors/CustomError';
+import { IUser } from '@/src/domain/users/entities/user.type';
+import { GetJsonApiResponse } from '@/src/http/response/types/json-api/get.type';
+import { CreateJsonApiResponse } from '@/src/http/response/types/json-api/create.type';
+import { DeleteJsonApiResponse } from '@/src/http/response/types/json-api/delete.type';
+import { IHttpRequest } from '@/src/http/request/types/request.type';
+import { IHttpResponse } from '@/src/http/response/types/response.type';
+import IUserRepository from '@/src/domain/users/repositories/user.repository';
 
-jest.mock('../../../infrastructure/users/repositories/mongodb-in-memory/user.repository.mjs');
+jest.mock('../../../domain/users/repositories/user.repository');
 
 jest.setTimeout(50000);
 
-function UserControllerFactory() {
-  const userService = new UserService(mockedUserRepository);
+function userControllerFactory() {
+  const userService = new UserService(mockedUserRepository as IUserRepository);
   return new UserController(userService);
 }
 
-function HttpFactory() {
+function httpFactory() {
   const request = jest.fn().mockImplementation(() => {
     return {
       body: {},
@@ -29,20 +36,20 @@ function HttpFactory() {
   });
 
   const response = jest.fn().mockImplementation(() => {
-    let headers = {};
+    let headers: any = {};
     let status = 200;
-    let responseData = {};
+    let responseData: any = {};
     return {
       status,
       headers,
       data: responseData,
-      writeHead: (statusCode, content_type) => {
+      writeHead: (statusCode: number, content_type: string) => {
         status = statusCode;
         headers.status = statusCode;
         headers.content_type = content_type;
         return true;
       },
-      write: (data) => {
+      write: (data: IUser) => {
         responseData = data;
         return true;
       },
@@ -59,10 +66,10 @@ function HttpFactory() {
 }
 
 describe('User controller', () => {
-  const userController = new UserControllerFactory();
-  let mockedHttp = new HttpFactory();
-  let mockedRequest = mockedHttp.request();
-  let mockedResponse = mockedHttp.response();
+  const userController = userControllerFactory();
+  let mockedHttp = httpFactory();
+  let mockedRequest = mockedHttp.request() as IHttpRequest;
+  let mockedResponse = mockedHttp.response() as IHttpResponse;
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -76,8 +83,8 @@ describe('User controller', () => {
     // arrange
 
     // act
-    const response = await userController.listAll(mockedRequest, mockedResponse);
-    const parsedResponse = JSON.parse(response);
+    const response: unknown = await userController.listAll(mockedRequest, mockedResponse);
+    const parsedResponse: GetJsonApiResponse = JSON.parse(response as string);
 
     // asserts
     expect(parsedResponse).toHaveProperty('data');
@@ -98,8 +105,8 @@ describe('User controller', () => {
     mockedRequest.pathParams.id = mockedUsersData[0]._id;
 
     // act
-    const response = await userController.getOneById(mockedRequest, mockedResponse);
-    const parsedResponse = JSON.parse(response);
+    const response: unknown = await userController.getOneById(mockedRequest, mockedResponse);
+    const parsedResponse: GetJsonApiResponse = JSON.parse(response as string);
 
     // asserts
     expect(parsedResponse).toHaveProperty('data');
@@ -121,11 +128,11 @@ describe('User controller', () => {
       status: 'ENABLED',
       city: 'Paulínia',
       uf: 'SP'
-    };
+    } as IUser;
 
     // act
-    const response = await userController.create(mockedRequest, mockedResponse);
-    const parsedResponse = JSON.parse(response);
+    const response: unknown = await userController.create(mockedRequest, mockedResponse);
+    const parsedResponse: CreateJsonApiResponse = JSON.parse(response as string);
 
     // asserts
     expect(parsedResponse).toHaveProperty('data');
@@ -149,11 +156,11 @@ describe('User controller', () => {
       status: 'ENABLED',
       city: 'Paulínia',
       uf: 'SP'
-    };
+    } as IUser;
 
     // act
-    const response = await userController.update(mockedRequest, mockedResponse);
-    const parsedResponse = JSON.parse(response);
+    const response: unknown = await userController.update(mockedRequest, mockedResponse);
+    const parsedResponse: CreateJsonApiResponse = JSON.parse(response as string);
 
     // asserts
     expect(parsedResponse).toHaveProperty('data');
@@ -172,8 +179,8 @@ describe('User controller', () => {
     mockedRequest.pathParams.id = mockedUsersData[0]._id;
 
     // act
-    const response = await userController.delete(mockedRequest, mockedResponse);
-    const parsedReponse = JSON.parse(response);
+    const response: unknown = await userController.delete(mockedRequest, mockedResponse);
+    const parsedReponse: DeleteJsonApiResponse = JSON.parse(response as string);
 
     // asserts
     expect(parsedReponse).toHaveProperty('message');
@@ -182,10 +189,10 @@ describe('User controller', () => {
 });
 
 describe('User controller expected errors', () => {
-  const userController = new UserControllerFactory();
-  let mockedHttp = new HttpFactory();
-  let mockedRequest = mockedHttp.request();
-  let mockedResponse = mockedHttp.response();
+  const userController = userControllerFactory();
+  let mockedHttp = httpFactory();
+  let mockedRequest = mockedHttp.request() as IHttpRequest;
+  let mockedResponse = mockedHttp.response() as IHttpResponse;
 
   afterEach(() => {
     jest.clearAllMocks();
@@ -211,7 +218,9 @@ describe('User controller expected errors', () => {
     // arrange
     mockedRequest.pathParams.id = 'invalidId';
     mockedUserRepository.getOneById = jest.fn()
-      .mockRejectedValueOnce(() => customError(400, "Invalid ID format."));
+      .mockRejectedValueOnce(() => {
+        throw new CustomError({ status: 400, message: "Invalid ID format." });
+      });
 
     // act
     const request = async () => await userController.getOneById(mockedRequest, mockedResponse);
@@ -229,7 +238,7 @@ describe('User controller expected errors', () => {
       status: 'ENABLED',
       city: 'Paulínia',
       uf: 'SP'
-    };
+    } as IUser;
 
     // act
     const request = async () => await userController.create(mockedRequest, mockedResponse);
@@ -249,7 +258,7 @@ describe('User controller expected errors', () => {
       status: 'ENABLED',
       city: 'Paulínia',
       uf: 'SP'
-    };
+    } as IUser;
 
     // act
     const request = async () => await userController.update(mockedRequest, mockedResponse);
@@ -269,12 +278,14 @@ describe('User controller expected errors', () => {
       status: 'ENABLED',
       city: 'Paulínia',
       uf: 'SP'
-    };
+    } as IUser;
     /** 
      * for deleting a user, first, the service checks if the user exists with a getOnebyId method
      * */
     mockedUserRepository.getOneById = jest.fn()
-      .mockRejectedValueOnce(() => customError(400, "Invalid ID format."));
+      .mockRejectedValueOnce(() => {
+        throw new CustomError({ status: 400, message: "Invalid ID format." });
+      });
 
     // act
     const request = async () => await userController.update(mockedRequest, mockedResponse);
@@ -303,7 +314,9 @@ describe('User controller expected errors', () => {
      * for deleting a user, first, the service checks if the user exists with a getOnebyId method
      * */
     mockedUserRepository.getOneById = jest.fn()
-      .mockRejectedValueOnce(() => customError(400, "Invalid ID format."));
+      .mockRejectedValueOnce(() => {
+        throw new CustomError({ status: 400, message: "Invalid ID format." });
+      });
 
     // act
     const request = async () => await userController.delete(mockedRequest, mockedResponse);

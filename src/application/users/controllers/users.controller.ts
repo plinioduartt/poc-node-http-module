@@ -1,12 +1,15 @@
-import responseHandler from "../../../handlers/responseHandler.mjs";
+import { IHttpRequest } from "@/src/http/request/types/request.type";
+import responseHandler from "../../../http/response/handlers/responseHandler";
+import { IHttpResponse } from "../../../http/response/types/response.type";
+import IUserService from "../services/user.interface";
 
 export default class UserController {
-  userService;
-  constructor(userService) {
+  private readonly userService: IUserService;
+  constructor(userService: IUserService) {
     this.userService = userService;
   }
 
-  async listAll(request, response) {
+  async listAll(request: IHttpRequest, response: IHttpResponse) {
     const searchParams = request.searchParams;
     const { offset, limit } = searchParams;
 
@@ -19,10 +22,10 @@ export default class UserController {
       limit,
     };
 
-    return responseHandler({ status: 200, data: responseData, response });
+    return responseHandler({ statusCode: 200, data: responseData, response });
   }
 
-  async getOneById(request, response) {
+  async getOneById(request: IHttpRequest, response: IHttpResponse) {
     const { id } = request.pathParams;
 
     const user = await this.userService.getOneById(id);
@@ -33,10 +36,10 @@ export default class UserController {
       }
     };
 
-    return responseHandler({ status: 200, data: responseData, response });
+    return responseHandler({ statusCode: 200, data: responseData, response });
   }
 
-  async create(request, response) {
+  async create(request: IHttpRequest, response: IHttpResponse) {
     const data = request.body;
     const newUser = await this.userService.create(data);
     const responseData = {
@@ -46,10 +49,10 @@ export default class UserController {
       }
     };
 
-    return responseHandler({ status: 201, data: responseData, response });
+    return responseHandler({ statusCode: 201, data: responseData, response });
   }
 
-  async update(request, response) {
+  async update(request: IHttpRequest, response: IHttpResponse) {
     const { id } = request.pathParams;
 
     const data = request.body;
@@ -61,10 +64,10 @@ export default class UserController {
       }
     };
 
-    return responseHandler({ status: 200, data: responseData, response });
+    return responseHandler({ statusCode: 200, data: responseData, response });
   }
 
-  async delete(request, response) {
+  async delete(request: IHttpRequest, response: IHttpResponse) {
     const { id } = request.pathParams;
 
     await this.userService.delete(id);
@@ -74,6 +77,6 @@ export default class UserController {
       data: null
     };
 
-    return responseHandler({ status: 204, data: responseData, response });
+    return responseHandler({ statusCode: 204, data: responseData, response });
   }
 }
